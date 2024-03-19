@@ -1,0 +1,53 @@
+.room-container {
+    margin-bottom: 20px; /* Add some margin between room containers */
+    width: 50%;
+  }
+.patch-panel-container {
+    display: flex;
+    justify-content: flex-start; /* Center horizontally */
+    align-items: center; /* TOP */
+    flex-direction: column;
+    height: 20vh; 
+  }
+  .patch-panel {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    background-color: #111111;
+    padding: 10px;
+    max-width: 100%;
+  }
+  .patch-panel-item {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .patch-panel-item.tmib {/*100mib*/
+    background-color: orangered;
+  } 
+  .patch-panel-item.hmib {/*100mib*/
+    background-color: orange;
+  }  
+  .patch-panel-item.gib {/*1gib*/
+    background-color: rgb(175, 172, 0);
+  } 
+  .patch-panel-item.tgib {/*10gib*/
+    background-color: green;
+  }
+  
+  .patch-panel-item.inactive {
+    background-color: #333;
+    color: white;
+  }
+  .patch-panel-item.unknown {
+    background-color: darkred;
+    color: white;
+  }
+  
