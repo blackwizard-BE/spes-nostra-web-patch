@@ -261,7 +261,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1>Patch Panel</h1>
+      <h1>Patch Panel Lijst</h1>
       <div className="patch-panel-container">
         {Object.entries(groupedPorts).map(([room, roomPorts], index) => (
           <div key={index} className="room-container">
