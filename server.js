@@ -22,7 +22,7 @@ db.all('SELECT * FROM ports', (err, rows) => {
   if (err) {
     console.error('Error retrieving data from the database:', err.message);
   } else {
-    console.log('Data from the database:', rows);
+    //console.log('Data from the database:', rows);
   }
 });
 
@@ -33,7 +33,7 @@ app.get('/api/ports', (req, res) => {
       console.error('Error executing query:', err.message);
       res.status(500).json({ error: 'Internal Server Error' });
     } else {
-      console.log('Fetched port data from the database:', rows);
+      
       res.json(rows);
     }
   });
@@ -73,7 +73,7 @@ app.put('/api/ports/:labelAndRoom', (req, res) => {
       console.error('Error updating port:', err.message);
       res.status(500).json({ error: 'Internal Server Error' });
     } else {
-      console.log(`Port ${label} in room ${roomName} updated successfully.`);
+      
       res.status(200).json({ message: `Port ${label} in room ${roomName} updated successfully.` });
     }
   });
