@@ -6,7 +6,7 @@ const app = express();
 const port = 3001;
 
 // Connect to the SQLite database
-const db = new sqlite3.Database('ports.db', (err) => {
+const db = new sqlite3.Database('ports.db', (err) => { //testdb = test.db||| prod db = ports.db
   if (err) {
     console.error('Error opening database:', err.message);
   } else {

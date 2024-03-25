@@ -38,8 +38,14 @@
   .patch-panel-item.gib {/*1gib*/
     background-color: rgb(175, 172, 0);
   } 
-  .patch-panel-item.tgib {/*10gib*/
+  .patch-panel-item.twofgib {/*2.5gib*/
     background-color: green;
+  }
+  .patch-panel-item.fgib {/*5gib*/
+    background-color: blueviolet;
+  }
+  .patch-panel-item.tgib {/*10gib*/
+    background-color: blue;
   }
   
   .patch-panel-item.inactive {

@@ -31,6 +31,14 @@ const PatchPanelItem = ({ port, onClick, onEdit }) => {
       statusClassName = 'gib';
       labelAddon = '1Gbit';
       break;
+    case 'twofgib':
+      statusClassName = 'twofgib';
+      labelAddon = '2.5Gbit';
+      break;
+    case 'fgib':
+      statusClassName = 'fgib';
+      labelAddon = '5Gbit';
+      break;
     case 'tgib':
       statusClassName = 'tgib';
       labelAddon = '10Gbit';
@@ -162,6 +170,14 @@ const EditMenu = ({ portInfo, onSave }) => {
         <label>
           <input type="radio" value="gib" checked={speed === 'gib'} onChange={handleSpeedChange} />
           1Gbit
+        </label>
+        <label>
+          <input type="radio" value="twofgib" checked={speed === 'twofgib'} onChange={handleSpeedChange} />
+          2.5Gbit
+        </label>
+        <label>
+          <input type="radio" value="fgib" checked={speed === 'fgib'} onChange={handleSpeedChange} />
+          5Gbit
         </label>
         <label>
           <input type="radio" value="tgib" checked={speed === 'tgib'} onChange={handleSpeedChange} />
