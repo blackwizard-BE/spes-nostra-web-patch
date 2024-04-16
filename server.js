@@ -6,7 +6,7 @@ const app = express();
 const port = 3001;
 
 // Connect to the SQLite database
-const db = new sqlite3.Database('ports.db', (err) => { //testdb = test.db||| prod db = ports.db
+const db = new sqlite3.Database('test.db', (err) => { //testdb = test.db||| prod db = ports.db
   if (err) {
     console.error('Error opening database:', err.message);
   } else {
@@ -38,7 +38,8 @@ app.get('/api/ports', (req, res) => {
     }
   });
 });
-app.get('/api/ports/:id', (req, res) => {
+app.get('/api/request/ports/:id', (req, res) => {
+
   const portId = req.params.id;
   // Query the database to get port data and related information by ID
   db.get(`
@@ -56,14 +57,17 @@ app.get('/api/ports/:id', (req, res) => {
 });
 
 
+
 // Endpoint to update port data
-app.put('/api/ports/:labelAndRoom', (req, res) => {
+app.put('/api/save/ports/:labelAndRoom', (req, res) => {
   const { labelAndRoom } = req.params;
   const { label: newLabel, status, room, type, length, info, connectedid } = req.body;
 
   // Split the labelAndRoom parameter to extract label and room
+  if(labelAndRoom!="undefined"){
   const [label, roomName] = labelAndRoom.split(':');
   const formattedRoomName = roomName.replace(/_/g, ' ');
+
 
   // Update the port data in the database
   db.run('UPDATE ports SET label = ?, status = ?, room = ?, type = ?, length = ?, info = ?, connectedid = ? WHERE label = ? AND room = ?', 
@@ -75,6 +79,25 @@ app.put('/api/ports/:labelAndRoom', (req, res) => {
     } else {
       
       res.status(200).json({ message: `Port ${label} in room ${roomName} updated successfully.` });
+    }
+  });
+}
+});
+app.put('/api/save/port/:id', (req, res) => {
+  const { id } = req.params;
+  const { status, type, length, connectedId} = req.body;
+
+
+  // Update the port data in the database
+  db.run('UPDATE ports SET status = ?, type = ?, length = ?, connectedid = ? WHERE id = ?', 
+         [status, type, length, connectedId, id], 
+         function(err) {
+    if (err) {
+      console.error('Error updating port:', err.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+    
+      res.status(200).json({ message: `Connected id: ${id} updated successfully.` });
     }
   });
 });

@@ -3,7 +3,7 @@ import './PatchPanel.css'; // Import CSS for styling
 
 // Function to fetch port data by ID
 const fetchPortById = (portId) => {
-  return fetch(`/api/ports/${portId}`)
+  return fetch(`/api/request/ports/${portId}`)
     .then(response => response.json())
     .catch(error => console.error('Error fetching port data:', error));
 };
@@ -110,7 +110,7 @@ const EditMenu = ({ portInfo, onSave }) => {
     const formattedRoomName = roomName.replace(/\s/g, '_');
 
     // Send the updated port information to the backend API
-    fetch(`/api/ports/${portInfo.label}:${formattedRoomName}`, {
+    fetch(`/api/save/ports/${portInfo.label}:${formattedRoomName}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -128,6 +128,25 @@ const EditMenu = ({ portInfo, onSave }) => {
         console.error('Error saving changes:', error);
         // Handle error, maybe show an error message
       });
+  fetch(`/api/save/port/${connectedId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: connectedId, status: speed, type: type, length: length, connectedId: portInfo.id}),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to save changes');
+      }
+      // Handle success, maybe show a success message
+        console.log("testing log");
+      onSave(); // Call the onSave callback after successful save
+    })
+    .catch(error => {
+      console.error('Error saving changes:', error);
+      // Handle error, maybe show an error message
+    });
   };
 
   return (
