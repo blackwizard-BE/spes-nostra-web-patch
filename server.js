@@ -6,7 +6,7 @@ const app = express();
 const port = 3001;
 
 // Connect to the SQLite database
-const db = new sqlite3.Database('test.db', (err) => { //testdb = test.db||| prod db = ports.db
+const db = new sqlite3.Database('ports.db', (err) => { //testdb = test.db||| prod db = ports.db
   if (err) {
     console.error('Error opening database:', err.message);
   } else {
@@ -56,7 +56,45 @@ app.get('/api/request/ports/:id', (req, res) => {
   });
 });
 
+app.get('/api/request/next', (req, res) => {
+  // Query the database to get the next available id
+  db.get(`
+    SELECT MAX(id) AS maxId
+    FROM ports
+  `, (err, result) => {
+    if (err) {
+      console.error('Error fetching port data:', err.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      // Extract the maximum id from the result
+      const maxId = result.maxId;
 
+      // Calculate the next available id (id + 1)
+      const nextId = maxId ? maxId + 1 : 1; // If maxId is null, start from 1
+
+      // Send the next available id as a response
+      res.json({ nextId });
+    }
+  });
+});
+
+
+app.put('/api/save/newport/:room', (req, res) => {
+  const { room } = req.params;
+
+  // Update the port data in the database
+  db.run( "INSERT INTO ports (label, room) VALUES (?,?)", 
+         ["New Port", room], 
+         function(err) {
+    if (err) {
+      console.error('Error updating port:', err.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+    
+      res.status(200).json({ message: `made ${room} successfully.` });
+    }
+  });
+});
 
 // Endpoint to update port data
 app.put('/api/save/ports/:labelAndRoom', (req, res) => {
@@ -70,7 +108,7 @@ app.put('/api/save/ports/:labelAndRoom', (req, res) => {
 
 
   // Update the port data in the database
-  db.run('UPDATE ports SET label = ?, status = ?, room = ?, type = ?, length = ?, info = ?, connectedid = ? WHERE label = ? AND room = ?', 
+  db.run('UPDATE ports SET label = ?, status = ?, room = ?, type = ?, length = ?, info = ?, connectedid = ? WHERE id = (SELECT MIN(id) FROM ports WHERE label = ? AND room = ?)', 
          [newLabel, status, room, type, length, info, connectedid, label, formattedRoomName], 
          function(err) {
     if (err) {

@@ -8,6 +8,15 @@ const fetchPortById = (portId) => {
     .catch(error => console.error('Error fetching port data:', error));
 };
 
+const AddButtonItem = ({ room, onClick }) => {
+
+  return (
+    <div className={`add-button`} onClick={() => onClick(room)}>
+      <p>Add</p>
+    </div>
+  );
+};
+
 
 
 // PatchPanelItem component for individual port
@@ -74,13 +83,13 @@ const PatchPanelItem = ({ port, onClick, onEdit }) => {
 };
 
 const EditMenu = ({ portInfo, onSave }) => {
-  const [portName, setPortName] = useState(portInfo.label);
-  const [roomName, setRoomName] = useState(portInfo.room);
-  const [type, setTypeName] = useState(portInfo.type);
-  const [length, setLength] = useState(portInfo.length);
-  const [info, setinfo] = useState(portInfo.info);
-  const [connectedId, setConnectedId] = useState(portInfo.connectedid);
-  const [speed, setSpeed] = useState(portInfo.status); // Default speed
+  const [portName, setPortName] = useState(portInfo.label || '');
+  const [roomName, setRoomName] = useState(portInfo.room || '');
+  const [type, setTypeName] = useState(portInfo.type || '');
+  const [length, setLength] = useState(portInfo.length || '');
+  const [info, setInfo] = useState(portInfo.info || '');
+  const [connectedId, setConnectedId] = useState(portInfo.connectedid || '');
+  const [speed, setSpeed] = useState(portInfo.status || 'tmib'); // Default speed
 
   const handleNameChange = (event) => {
     setPortName(event.target.value);
@@ -92,7 +101,7 @@ const EditMenu = ({ portInfo, onSave }) => {
     setLength(event.target.value);
   };
   const handleInfoChange = (event) => {
-    setinfo(event.target.value);
+    setInfo(event.target.value);
   };
   const handleRoomChange = (event) => {
     setRoomName(event.target.value);
@@ -232,6 +241,7 @@ const PortInfo = ({ portInfo }) => {
   return (
     <div className="port-info">
       <h2>Port Information</h2>
+      <p><strong>Id:</strong> {portInfo.id}</p>
       <p><strong>Label:</strong> {portInfo.label}</p>
       <p><strong>Status:</strong> {portInfo.status}</p>
       <p><strong>Room:</strong> {portInfo.room}</p>
@@ -278,21 +288,76 @@ export default function App() {
     setEditMode(true); // Set edit mode to true
   };
 
+  // Handle Add button click event
+  const handleAddClick = (room) => {
+    
+    fetch(`/api/save/newport/${room}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ room: room}),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to save changes');
+        }
+        // Handle success, maybe show a success message
+          console.log("testing log");
+          refreshPage();
+
+      })
+      .catch(error => {
+        console.error('Error saving changes:', error);
+        // Handle error, maybe show an error message
+      });
+
+
+
+  };
+
+
+
   // Function to handle save callback
   const handleSave = () => {
     fetchPorts(); // Refetch ports data after saving changes
     setEditMode(false); // Exit edit mode
   };
 
-  // Group ports by room
-  const groupedPorts = ports.reduce((groups, port) => {
-    const room = port.room;
-    if (!groups[room]) {
-      groups[room] = [];
-    }
-    groups[room].push(port);
-    return groups;
-  }, {});
+// Group ports by room
+const groupedPorts = ports.reduce((groups, port) => {
+  const room = port.room;
+  if (!groups[room]) {
+    groups[room] = [];
+  }
+  groups[room].push(port);
+  return groups;
+}, {});
+
+// Sort ports within each room by label
+for (const room in groupedPorts) {
+  groupedPorts[room].sort((a, b) => {
+    // Extract label prefix and numeric part from the label
+    const [prefixA, numberA] = a.label.match(/^([a-z]+)(\d+)$/i).slice(1);
+    const [prefixB, numberB] = b.label.match(/^([a-z]+)(\d+)$/i).slice(1);
+
+    // Compare label prefixes alphabetically
+    if (prefixA < prefixB) return -1;
+    if (prefixA > prefixB) return 1;
+
+    // If prefixes are the same, compare numeric parts numerically
+    return parseInt(numberA) - parseInt(numberB);
+  });
+}
+
+console.log(groupedPorts);
+
+
+  
+
+  function refreshPage() {
+    window.location.reload(false);
+  }
 
   return (
     <div className="app">
@@ -310,10 +375,15 @@ export default function App() {
                   onEdit={handleEditClick}
                 />
               ))}
+              <AddButtonItem type="button"
+                room={room}
+                onClick={handleAddClick}
+              />
             </div>
           </div>
         ))}
       </div>
+      
       {selectedPort && !editMode && <PortInfo portInfo={selectedPort} />}
       {selectedPort && editMode && (
         <EditMenu portInfo={selectedPort} onSave={handleSave} />
