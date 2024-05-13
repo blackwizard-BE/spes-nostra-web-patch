@@ -4,10 +4,10 @@
   }
 .patch-panel-container {
     display: flex;
-    justify-content: flex-start; /* Center horizontally */
-    align-items: center; /* TOP */
+    justify-content: flex-start; /* TOP */
+    align-items: center; 
     flex-direction: column;
-    height: 20vh; 
+    height: 100%; 
   }
   .patch-panel {
     display: flex;
@@ -66,5 +66,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .stickyleft{
+    margin-left: 20px;
+  background-color: lightblue;
+    align-self: flex-start;
+    height: 0px;
   }
   

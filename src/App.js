@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import StickyBox from "react-sticky-box";
 import './PatchPanel.css'; // Import CSS for styling
 
 // Function to fetch port data by ID
@@ -149,7 +150,7 @@ const EditMenu = ({ portInfo, onSave }) => {
         throw new Error('Failed to save changes');
       }
       // Handle success, maybe show a success message
-        console.log("testing log");
+        //console.log("testing log");
       onSave(); // Call the onSave callback after successful save
     })
     .catch(error => {
@@ -159,7 +160,7 @@ const EditMenu = ({ portInfo, onSave }) => {
   };
 
   return (
-    <div className="edit-menu">
+    <StickyBox className="edit-menu stickyleft">
       <h2>Edit Port {portInfo.label}</h2>
       <label>
         Port Name: &nbsp;
@@ -187,33 +188,40 @@ const EditMenu = ({ portInfo, onSave }) => {
       </label>
       <div>
         Speed:
+        <br/>
         <label>
           <input type="radio" value="tmib" checked={speed === 'tmib'} onChange={handleSpeedChange} />
           10Mbit
         </label>
+        <br/>
         <label>
           <input type="radio" value="hmib" checked={speed === 'hmib'} onChange={handleSpeedChange} />
           100Mbit
         </label>
+        <br/>
         <label>
           <input type="radio" value="gib" checked={speed === 'gib'} onChange={handleSpeedChange} />
           1Gbit
         </label>
+        <br/>
         <label>
           <input type="radio" value="twofgib" checked={speed === 'twofgib'} onChange={handleSpeedChange} />
           2.5Gbit
         </label>
+        <br/>
         <label>
           <input type="radio" value="fgib" checked={speed === 'fgib'} onChange={handleSpeedChange} />
           5Gbit
         </label>
+        <br/>
         <label>
           <input type="radio" value="tgib" checked={speed === 'tgib'} onChange={handleSpeedChange} />
           10Gbit
         </label>
       </div>
+        <br/>
       <button onClick={handleSave}>Save</button>
-    </div>
+    </StickyBox>
   );
 };
 
@@ -239,7 +247,10 @@ const PortInfo = ({ portInfo }) => {
 
 
   return (
-    <div className="port-info">
+    
+    <StickyBox className="stickyleft">
+    
+    <div>
       <h2>Port Information</h2>
       <p><strong>Id:</strong> {portInfo.id}</p>
       <p><strong>Label:</strong> {portInfo.label}</p>
@@ -253,6 +264,7 @@ const PortInfo = ({ portInfo }) => {
       )}
       {/* Add more information as needed */}
     </div>
+    </StickyBox>
   );
 };
 
@@ -303,7 +315,7 @@ export default function App() {
           throw new Error('Failed to save changes');
         }
         // Handle success, maybe show a success message
-          console.log("testing log");
+          //console.log("testing log");
           refreshPage();
 
       })
@@ -331,7 +343,23 @@ const groupedPorts = ports.reduce((groups, port) => {
     groups[room] = [];
   }
   groups[room].push(port);
-  return groups;
+
+  // Sort groups (rooms) alphabetically by room name before returning
+  return Object.keys(groups).sort().reduce((sortedGroups, key) => {
+    sortedGroups[key] = groups[key].sort((a, b) => {
+      // Extract label prefix and numeric part from the label
+      const [prefixA, numberA] = a.label.match(/^([a-z]+)(\d+)$/i).slice(1);
+      const [prefixB, numberB] = b.label.match(/^([a-z]+)(\d+)$/i).slice(1);
+
+      // Compare label prefixes alphabetically
+      if (prefixA < prefixB) return -1;
+      if (prefixA > prefixB) return 1;
+
+      // If prefixes are the same, compare numeric parts numerically
+      return parseInt(numberA) - parseInt(numberB);
+    });
+    return sortedGroups;
+  }, {});
 }, {});
 
 // Sort ports within each room by label
@@ -350,7 +378,7 @@ for (const room in groupedPorts) {
   });
 }
 
-console.log(groupedPorts);
+//console.log(groupedPorts);
 
 
   
@@ -363,6 +391,11 @@ console.log(groupedPorts);
     <div className="app">
       <h1>Patch Panel Lijst</h1>
       <div className="patch-panel-container">
+      {selectedPort && !editMode && <PortInfo portInfo={selectedPort} />}
+      {selectedPort && editMode && (
+        <EditMenu portInfo={selectedPort} onSave={handleSave} />
+      )}
+
         {Object.entries(groupedPorts).map(([room, roomPorts], index) => (
           <div key={index} className="room-container">
             <h2>{room}</h2>
@@ -384,10 +417,7 @@ console.log(groupedPorts);
         ))}
       </div>
       
-      {selectedPort && !editMode && <PortInfo portInfo={selectedPort} />}
-      {selectedPort && editMode && (
-        <EditMenu portInfo={selectedPort} onSave={handleSave} />
-      )}
+      
     </div>
   );
 }
